@@ -1,0 +1,172 @@
+Uso de la aplicación (continuación)
+
+Operaciones con tareas (continuación):
+
+DELETE /api/tasks/{id} - Eliminar una tarea
+
+
+Documentación API:
+
+Acceder a Swagger UI: http://localhost:8080/swagger-ui.html
+Ver documentación OpenAPI: http://localhost:8080/v3/api-docs
+
+
+Consola H2:
+
+URL: http://localhost:8080/h2-console
+JDBC URL: jdbc:h2:mem:taskdb
+Usuario: sa
+Contraseña: (en blanco)
+
+
+
+Detalles de la implementación
+Modelo de datos
+He implementado tres entidades principales:
+
+User (usuarios):
+
+Almacena información de los usuarios del sistema
+Campos: id, username, password, email, fullName
+Relación one-to-many con Task
+
+
+TaskStatus (estados_tarea):
+
+Define los posibles estados de una tarea
+Valores precargados: Pendiente, En Progreso, En Revisión, Completada, Cancelada
+Campos: id, name, description
+
+
+Task (tareas):
+
+Representa las tareas creadas por los usuarios
+Campos: id, title, description, dueDate, status, user, createdAt, updatedAt
+Relación many-to-one con User y TaskStatus
+
+
+
+Seguridad y autenticación
+La implementación de seguridad utiliza Spring Security con JWT:
+
+Filtro de autenticación: Valida el token JWT en cada solicitud
+JWT Utils: Genera y valida tokens JWT
+Configuración de seguridad: Define las rutas protegidas y permitidas
+
+Las rutas públicas son:
+
+/api/auth/** - Para login
+/h2-console/** - Acceso a la consola H2
+/swagger-ui/**, /v3/api-docs/** - Documentación de la API
+
+Todas las demás rutas requieren autenticación con token JWT.
+Aplicación de principios SOLID
+
+Principio de responsabilidad única (S):
+
+Cada clase tiene una única responsabilidad (controladores, servicios, repositorios)
+Separación clara entre controladores, servicios y repositorios
+
+
+Principio de abierto/cerrado (O):
+
+La estructura permite extender funcionalidades sin modificar código existente
+Los repositorios extienden JpaRepository sin modificar su comportamiento
+
+
+Principio de sustitución de Liskov (L):
+
+Las implementaciones respetan los contratos de las interfaces
+UserDetailsServiceImpl implementa correctamente UserDetailsService
+
+
+Principio de segregación de interfaces (I):
+
+Interfaces específicas para cada repositorio
+DTOs específicos para cada operación
+
+
+Principio de inversión de dependencias (D):
+
+Inyección de dependencias mediante constructor
+Dependencia en abstracciones (interfaces) en lugar de implementaciones concretas
+
+
+
+API First
+La implementación sigue el enfoque API First:
+
+Definición del contrato: openapi.yml define todas las rutas, modelos y respuestas
+Generación de código: Plugin Maven openapi-generator-maven-plugin genera interfaces de controladores
+Implementación de controladores: Las clases implementan las interfaces generadas
+
+El uso de API First garantiza:
+
+Documentación precisa y actualizada
+Consistencia entre la documentación y la implementación
+Mejor experiencia para los consumidores de la API
+
+Manejo de excepciones
+Se ha implementado un manejo centralizado de excepciones mediante:
+
+GlobalExceptionHandler: Procesa todas las excepciones y retorna respuestas HTTP apropiadas
+ResourceNotFoundException: Excepción personalizada para recursos no encontrados
+DTOs de error: Estructura uniforme para las respuestas de error
+
+Datos precargados
+La aplicación carga automáticamente al inicio:
+
+Estados de tareas:
+
+Pendiente
+En Progreso
+En Revisión
+Completada
+Cancelada
+
+
+Usuarios:
+
+usuario1/password1 (usuario1@nuevospa.com)
+usuario2/password2 (usuario2@nuevospa.com)
+admin/admin123 (admin@nuevospa.com)
+
+
+
+Pruebas de la API
+Para facilitar las pruebas, he incluido:
+
+Colección de Postman: nuevo_spa_tasks_api.postman_collection.json con todas las operaciones
+Variables de entorno: Base URL y token JWT para automatizar las pruebas
+Ejemplos de peticiones: Formato para cada tipo de operación (login, CRUD)
+
+Instrucciones para pruebas manuales
+
+Iniciar sesión:
+bashCopiarcurl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"usuario1","password":"password1"}'
+
+Crear una tarea (usando el token obtenido):
+bashCopiarcurl -X POST http://localhost:8080/api/tasks \
+  -H "Authorization: Bearer {TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Nueva tarea","description":"Descripción de la tarea","statusId":1}'
+
+Listar todas las tareas:
+bashCopiarcurl -X GET http://localhost:8080/api/tasks \
+  -H "Authorization: Bearer {TOKEN}"
+
+
+Conclusiones
+La API implementada cumple con todos los requisitos técnicos y funcionales solicitados:
+
+Utiliza Java 17 y Spring Boot 3.4.x
+Implementa una base de datos H2 con JPA
+Proporciona autenticación segura mediante JWT
+Documenta la API con OpenAPI/Swagger
+Implementa operaciones CRUD para tareas
+Aplica principios SOLID y buenas prácticas
+Incluye documentación detallada y ejemplos de uso
+
+La solución es escalable, mantenible y sigue los estándares de la industria para el desarrollo de APIs RESTful.
