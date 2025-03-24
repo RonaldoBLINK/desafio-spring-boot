@@ -2,6 +2,7 @@ package service;
 
 import dto.TaskRequest;
 import dto.TaskResponse;
+import exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import model.Task;
 import model.TaskStatus;

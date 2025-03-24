@@ -62,7 +62,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
-        // Para acceder a la consola H2
         http.headers(headers -> headers.frameOptions(frameOption -> frameOption.disable()));
 
         http.authenticationProvider(authenticationProvider());
